@@ -1,0 +1,9 @@
+apple=quả táo
+banana=quả chuối
+computer=máy tính
+dictionary=từ điển
+programming=lập trình
+network=mạng máy tính
+python=con trăn
+compute=tính toán
+water=nước
