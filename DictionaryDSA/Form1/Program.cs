@@ -15,6 +15,7 @@ namespace EnglishVietnameseDictionary
             // Chuẩn bị giao diện
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
 
             // Lệnh quan trọng nhất: Chạy Form1 lên
             // Nếu chữ Form1 bị đỏ, hãy đảm bảo Form1.cs của bạn 

@@ -37,6 +37,9 @@
             label2 = new Label();
             label1 = new Label();
             label3 = new Label();
+            btnImport = new Button();
+            btnEdit = new Button();
+            btnDelete = new Button();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -47,10 +50,10 @@
             btnAdd.FlatStyle = FlatStyle.Flat;
             btnAdd.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             btnAdd.ForeColor = Color.Black;
-            btnAdd.Location = new Point(801, 67);
+            btnAdd.Location = new Point(845, 210);
             btnAdd.Margin = new Padding(4);
             btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(133, 51);
+            btnAdd.Size = new Size(125, 42);
             btnAdd.TabIndex = 0;
             btnAdd.Text = "THÊM TỪ";
             btnAdd.UseVisualStyleBackColor = false;
@@ -61,7 +64,7 @@
             lstWords.BackColor = Color.White;
             lstWords.BorderStyle = BorderStyle.None;
             lstWords.FormattingEnabled = true;
-            lstWords.Location = new Point(13, 169);
+            lstWords.Location = new Point(30, 169);
             lstWords.Margin = new Padding(4);
             lstWords.Name = "lstWords";
             lstWords.Size = new Size(208, 350);
@@ -72,10 +75,10 @@
             // 
             txtSearch.BackColor = SystemColors.Window;
             txtSearch.BorderStyle = BorderStyle.None;
-            txtSearch.Location = new Point(290, 80);
+            txtSearch.Location = new Point(299, 78);
             txtSearch.Margin = new Padding(4);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(477, 25);
+            txtSearch.Size = new Size(549, 25);
             txtSearch.TabIndex = 2;
             txtSearch.TextChanged += txtSearch_TextChanged;
             // 
@@ -83,11 +86,11 @@
             // 
             txtResult.BackColor = Color.White;
             txtResult.BorderStyle = BorderStyle.None;
-            txtResult.Location = new Point(280, 215);
+            txtResult.Location = new Point(299, 210);
             txtResult.Margin = new Padding(4);
             txtResult.Multiline = true;
             txtResult.Name = "txtResult";
-            txtResult.Size = new Size(654, 280);
+            txtResult.Size = new Size(469, 309);
             txtResult.TabIndex = 3;
             // 
             // lblStatus
@@ -108,7 +111,6 @@
             panel1.Controls.Add(label2);
             panel1.Controls.Add(label1);
             panel1.Controls.Add(txtSearch);
-            panel1.Controls.Add(btnAdd);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
@@ -121,7 +123,7 @@
             label2.BackColor = Color.DodgerBlue;
             label2.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             label2.ForeColor = Color.White;
-            label2.Location = new Point(113, 80);
+            label2.Location = new Point(113, 78);
             label2.Name = "label2";
             label2.Size = new Size(160, 25);
             label2.TabIndex = 6;
@@ -133,7 +135,7 @@
             label1.BackColor = Color.DodgerBlue;
             label1.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
             label1.ForeColor = Color.White;
-            label1.Location = new Point(349, 20);
+            label1.Location = new Point(391, 21);
             label1.Name = "label1";
             label1.Size = new Size(275, 37);
             label1.TabIndex = 0;
@@ -145,11 +147,59 @@
             label3.BackColor = Color.White;
             label3.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             label3.ForeColor = Color.Black;
-            label3.Location = new Point(280, 169);
+            label3.Location = new Point(299, 169);
             label3.Name = "label3";
             label3.Size = new Size(126, 25);
             label3.TabIndex = 7;
             label3.Text = "Nghĩa của từ";
+            // 
+            // btnImport
+            // 
+            btnImport.BackColor = Color.White;
+            btnImport.FlatAppearance.BorderSize = 0;
+            btnImport.FlatStyle = FlatStyle.Flat;
+            btnImport.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnImport.ForeColor = Color.Black;
+            btnImport.Location = new Point(845, 300);
+            btnImport.Margin = new Padding(4);
+            btnImport.Name = "btnImport";
+            btnImport.Size = new Size(125, 42);
+            btnImport.TabIndex = 7;
+            btnImport.Text = "NẠP TỪ";
+            btnImport.UseVisualStyleBackColor = false;
+            btnImport.Click += btnImport_Click;
+            // 
+            // btnEdit
+            // 
+            btnEdit.BackColor = Color.White;
+            btnEdit.FlatAppearance.BorderSize = 0;
+            btnEdit.FlatStyle = FlatStyle.Flat;
+            btnEdit.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnEdit.ForeColor = Color.Black;
+            btnEdit.Location = new Point(845, 390);
+            btnEdit.Margin = new Padding(4);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(125, 42);
+            btnEdit.TabIndex = 8;
+            btnEdit.Text = "SỬA TỪ";
+            btnEdit.UseVisualStyleBackColor = false;
+            btnEdit.Click += btnEdit_Click;
+            // 
+            // btnDelete
+            // 
+            btnDelete.BackColor = Color.White;
+            btnDelete.FlatAppearance.BorderSize = 0;
+            btnDelete.FlatStyle = FlatStyle.Flat;
+            btnDelete.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnDelete.ForeColor = Color.Black;
+            btnDelete.Location = new Point(845, 477);
+            btnDelete.Margin = new Padding(4);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(125, 42);
+            btnDelete.TabIndex = 9;
+            btnDelete.Text = "XÓA TỪ";
+            btnDelete.UseVisualStyleBackColor = false;
+            btnDelete.Click += btnDelete_Click;
             // 
             // Form1
             // 
@@ -157,11 +207,15 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.AliceBlue;
             ClientSize = new Size(1000, 562);
+            Controls.Add(btnDelete);
             Controls.Add(label3);
+            Controls.Add(btnEdit);
             Controls.Add(lstWords);
+            Controls.Add(btnImport);
             Controls.Add(lblStatus);
             Controls.Add(panel1);
             Controls.Add(txtResult);
+            Controls.Add(btnAdd);
             Font = new Font("Segoe UI", 11F);
             Margin = new Padding(4);
             Name = "Form1";
@@ -184,5 +238,8 @@
         private Label label1;
         private Label label2;
         private Label label3;
+        private Button btnImport;
+        private Button btnEdit;
+        private Button btnDelete;
     }
 }
