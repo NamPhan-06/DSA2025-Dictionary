@@ -25,7 +25,6 @@ namespace EnglishVietnameseDictionary
 
         public void InitSampleData()
         {
-            // Tạo file mẫu chuẩn CSV
             File.WriteAllText(_filePath, "apple,quả táo\nbanana,quả chuối\ncomputer,máy tính");
         }
     }
