@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\DELL\\DSA\\DictionaryDSA(1)\\DictionaryDSA\\Form1\\Form1.csproj",
+      "projectUniqueName": "C:\\Users\\DELL\\DSA\\DictionaryDSA (Updated)\\Form1\\Form1.csproj",
       "projectName": "Form1",
-      "projectPath": "C:\\Users\\DELL\\DSA\\DictionaryDSA(1)\\DictionaryDSA\\Form1\\Form1.csproj",
+      "projectPath": "C:\\Users\\DELL\\DSA\\DictionaryDSA (Updated)\\Form1\\Form1.csproj",
       "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DELL\\DSA\\DictionaryDSA(1)\\DictionaryDSA\\Form1\\obj\\",
+      "outputPath": "C:\\Users\\DELL\\DSA\\DictionaryDSA (Updated)\\Form1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",

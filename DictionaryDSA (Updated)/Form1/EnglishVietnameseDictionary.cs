@@ -9,12 +9,12 @@ namespace EnglishVietnameseDictionary
     public class DictionaryManager
     {
         // CẤU TRÚC DỮ LIỆU
-        public Dictionary<string, string> DataDict { get; private set; }
-        public List<string> KeyList { get; private set; }   // List cho Keys
-        public List<string> ValueList { get; private set; } // List cho Values (ít dùng hơn nếu đã có Dict, nhưng vẫn tạo theo yêu cầu)
+        public Dictionary<string, string> DataDict { get; set; }
+        public List<string> KeyList { get; set; }   // List cho Keys
+        public List<string> ValueList { get; set; } // List cho Values 
 
 
-        private string _filePath = "data.txt";
+        public string _filePath = "data.csv";
 
         public DictionaryManager()
         {
@@ -23,11 +23,32 @@ namespace EnglishVietnameseDictionary
             ValueList = new List<string>();
         }
 
+        public void InitSampleData()
+        {
+            // Tạo file mẫu chuẩn CSV
+            File.WriteAllText(_filePath, "apple,quả táo\nbanana,quả chuối\ncomputer,máy tính");
+        }
+    }
+    public class DictionaryBasic 
+    {
+        private DictionaryManager _manager;
+        private DictionaryAlgo _algo;
+
+        public DictionaryBasic(DictionaryManager manager) 
+        { 
+            _manager = manager;
+        }
+
+        public void SetAlgo(DictionaryAlgo algo)
+        {
+            _algo = algo; 
+        }
+
         // Hàm nạp dữ liệu từ một đường dẫn file cụ thể
         // Kiểu trả về là int để đếm số từ thêm được
         public int ImportData(string path)
         {
-            if (!File.Exists(path)) return 0;
+            if (!File.Exists(path)) _manager.InitSampleData();
 
             int countNewWords = 0; // Biến đếm số từ mới
 
@@ -46,9 +67,9 @@ namespace EnglishVietnameseDictionary
                         string value = parts[1].Trim().Trim('"');
 
                         // Kiểm tra trùng: Chỉ thêm nếu chưa có
-                        if (!DataDict.ContainsKey(key))
+                        if (!_manager.DataDict.ContainsKey(key))
                         {
-                            DataDict.Add(key, value);
+                            _manager.DataDict.Add(key, value);
                             countNewWords++; // Tăng biến đếm lên 1
                         }
                         // Nếu trùng thì bỏ qua
@@ -60,6 +81,7 @@ namespace EnglishVietnameseDictionary
             if (countNewWords > 0)
             {
                 SyncListsFromDict();
+                _algo.SortData();
             }
 
             return countNewWords; // Trả về kết quả
@@ -68,9 +90,9 @@ namespace EnglishVietnameseDictionary
         // Thêm từ mới
         public bool AddWord(string en, string vn)
         {
-            if (!DataDict.ContainsKey(en))
+            if (!_manager.DataDict.ContainsKey(en))
             {
-                DataDict.Add(en, vn);
+                _manager.DataDict.Add(en, vn);
                 SyncListsFromDict(); // Cập nhật lại List Keys và Values
                 SaveToFile();
                 return true;
@@ -82,9 +104,9 @@ namespace EnglishVietnameseDictionary
         public bool RemoveWord(string key)
         {
             // Kiểm tra xem từ có tồn tại không
-            if (DataDict.ContainsKey(key))
+            if (_manager.DataDict.ContainsKey(key))
             {
-                DataDict.Remove(key); // Xóa khỏi Dictionary
+                _manager.DataDict.Remove(key); // Xóa khỏi Dictionary
                 SyncListsFromDict();  // Cập nhật lại 2 List (quan trọng)
                 SaveToFile();         // Lưu lại file ngay lập tức
                 return true;
@@ -95,9 +117,9 @@ namespace EnglishVietnameseDictionary
         // Hàm Sửa nghĩa (Chỉ sửa nghĩa tiếng Việt)
         public bool UpdateMeaning(string key, string newMeaning)
         {
-            if (DataDict.ContainsKey(key))
+            if (_manager.DataDict.ContainsKey(key))
             {
-                DataDict[key] = newMeaning; // Gán nghĩa mới
+                _manager.DataDict[key] = newMeaning; // Gán nghĩa mới
                                             // Không cần sort lại vì Key không đổi, nhưng cần cập nhật List Values
                 SyncListsFromDict();
                 SaveToFile();
@@ -109,14 +131,14 @@ namespace EnglishVietnameseDictionary
         public void ClearAllData()
         {
             // 1. Xóa sạch dữ liệu trong Dictionary (O(n))
-            DataDict.Clear();
+            _manager.DataDict.Clear();
 
             // 2. BẮT BUỘC: Xóa sạch cả các List đi kèm
-            KeyList.Clear();
+            _manager.KeyList.Clear();
 
-            if (ValueList != null)
+            if (_manager.ValueList != null)
             {
-                ValueList.Clear();
+                _manager.ValueList.Clear();
             }
         }
         public string GetMeaning(string key)
@@ -125,9 +147,9 @@ namespace EnglishVietnameseDictionary
             if (string.IsNullOrEmpty(key)) return "Vui lòng nhập từ.";
 
             // Kiểm tra trong kho dữ liệu
-            if (DataDict.ContainsKey(key))
+            if (_manager.DataDict.ContainsKey(key))
             {
-                return DataDict[key];
+                return _manager.DataDict[key];
             }
             else
             {
@@ -138,53 +160,74 @@ namespace EnglishVietnameseDictionary
         private void SaveToFile()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var kvp in DataDict)
+            foreach (var kvp in _manager.DataDict)
             {
                 sb.AppendLine($"{kvp.Key},{kvp.Value}");
             }
-            File.WriteAllText(_filePath, sb.ToString());
+            File.WriteAllText(_manager._filePath, sb.ToString());
+        }
+        public void SyncListsFromDict()
+        {
+            _manager.KeyList = _manager.DataDict.Keys.ToList();
+            _manager.ValueList = _manager.DataDict.Values.ToList();
+        }
+
+        // Hàm phụ trợ để đổi chỗ 2 phần tử trong List
+        public void Swap(List<string> list, int indexA, int indexB)
+        {
+            string temp = list[indexA];
+            list[indexA] = list[indexB];
+            list[indexB] = temp;
+        }
+    }
+
+    public class DictionaryAlgo
+    {
+        private DictionaryManager _manager;
+        private DictionaryBasic _basic;
+
+        public DictionaryAlgo(DictionaryManager manager)
+        {
+           _manager = manager;
+        }
+        public void SetBasic(DictionaryBasic basic)
+        {
+            _basic = basic;
         }
 
         // =========================================================
-        // THUẬT TOÁN 1: Stream Processing (Đọc file dữ liệu)
-        // Kỹ thuật đọc file tối ưu bộ nhớ
+        // THUẬT TOÁN BỔ SUNG 1: SELECTION SORT (Sắp xếp Chọn)
+        // Độ phức tạp: O(N^2) - Tương đương Bubble Sort nhưng ít lần hoán đổi hơn
         // =========================================================
-        public void LoadData()
+        public void SelectionSort()
         {
-            // Đổi tên file thành đuôi .csv
-            _filePath = "data.csv";
+            // Lấy số lượng phần tử
+            int n = _manager.KeyList.Count;
 
-            if (!File.Exists(_filePath)) InitSampleData();
-
-            DataDict.Clear();
-            KeyList.Clear();
-            ValueList.Clear();
-
-            using (StreamReader sr = new StreamReader(_filePath))
+            // VÒNG LẶP 1: Duyệt qua từng vị trí từ đầu đến áp chót
+            for (int i = 0; i < n - 1; i++)
             {
-                string line;
-                while ((line = sr.ReadLine()) != null)
+                // Giả sử vị trí hiện tại (i) đang là nhỏ nhất
+                int minIndex = i;
+
+                // VÒNG LẶP 2: Quét các phần tử còn lại phía sau để tìm ra "kẻ nhỏ hơn"
+                for (int j = i + 1; j < n; j++)
                 {
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-
-                    // QUAN TRỌNG: Cắt chuỗi bằng dấu phẩy, tối đa 2 phần
-                    var parts = line.Split(new char[] { ',' }, 2);
-
-                    if (parts.Length == 2)
+                    // So sánh: Nếu từ tại j NHỎ HƠN từ tại minIndex (A < B)
+                    // StringComparison.OrdinalIgnoreCase: Bỏ qua hoa thường
+                    if (String.Compare(_manager.KeyList[j], _manager.KeyList[minIndex], StringComparison.OrdinalIgnoreCase) < 0)
                     {
-                        // Trim chả 2 đầu và xóa cả dấu ngoặc kép " nếu có (do Excel hay tự thêm vào)
-                        string key = parts[0].Trim().Trim('"');
-                        string value = parts[1].Trim().Trim('"');
-
-                        if (!DataDict.ContainsKey(key))
-                        {
-                            DataDict.Add(key, value);
-                        }
+                        minIndex = j; // Cập nhật lại vị trí của phần tử nhỏ nhất
                     }
                 }
-            }
 
-            SyncListsFromDict();
+                // Sau khi quét hết, nếu tìm thấy phần tử nhỏ hơn vị trí i
+                if (minIndex != i)
+                {
+                    // THỰC HIỆN HOÁN ĐỔI (SWAP)
+                    _basic.Swap(_manager.KeyList, i, minIndex);
+                }
+            }
         }
         // =========================================================
         // THUẬT TOÁN 2: QuickSort Thủ Công (Custom QuickSort)
@@ -194,9 +237,9 @@ namespace EnglishVietnameseDictionary
         // Hàm chính để gọi từ bên ngoài
         public void SortData()
         {
-            if (KeyList.Count > 1)
+            if (_manager.KeyList.Count > 1)
             {
-                QuickSort(KeyList, 0, KeyList.Count - 1);
+                QuickSort(_manager.KeyList, 0, _manager.KeyList.Count - 1);
             }
         }
 
@@ -235,31 +278,17 @@ namespace EnglishVietnameseDictionary
                 {
                     i++;
                     // Đổi chỗ list[i] và list[j]
-                    Swap(list, i, j);
+                    _basic.Swap(list, i, j);
                 }
             }
 
             // Đổi chỗ phần tử chốt vào đúng vị trí của nó (giữa 2 phần)
-            Swap(list, i + 1, high);
+            _basic.Swap(list, i + 1, high);
 
             return i + 1;
         }
 
-        // Hàm phụ trợ để đổi chỗ 2 phần tử trong List
-        private void Swap(List<string> list, int indexA, int indexB)
-        {
-            string temp = list[indexA];
-            list[indexA] = list[indexB];
-            list[indexB] = temp;
-        }
-
         // Đồng bộ lại List từ Dictionary (Reset)
-        private void SyncListsFromDict()
-        {
-            KeyList = DataDict.Keys.ToList();
-            ValueList = DataDict.Values.ToList();
-            SortData(); // Luôn sắp xếp sau khi load
-        }
 
         // =========================================================
         // THUẬT TOÁN 3: Binary Search Thủ Công (Custom Binary Search)
@@ -270,7 +299,7 @@ namespace EnglishVietnameseDictionary
         {
             // Khởi tạo 2 mốc giới hạn: Đầu và Cuối danh sách
             int left = 0;
-            int right = KeyList.Count - 1;
+            int right = _manager.KeyList.Count - 1;
 
             // Chạy vòng lặp khi khoảng cách tìm kiếm vẫn còn hợp lệ
             while (left <= right)
@@ -280,7 +309,7 @@ namespace EnglishVietnameseDictionary
                 int mid = left + (right - left) / 2;
 
                 // Lấy từ ở vị trí giữa ra để so sánh
-                string midWord = KeyList[mid];
+                string midWord = _manager.KeyList[mid];
 
                 // So sánh từ ở giữa với từ khóa (keyword)
                 // Sử dụng StringComparison.OrdinalIgnoreCase để không phân biệt hoa thường
@@ -318,7 +347,7 @@ namespace EnglishVietnameseDictionary
         // =========================================================
         public void BubbleSort()
         {
-            int n = KeyList.Count; // Lấy toàn bộ số lượng từ
+            int n = _manager.KeyList.Count; // Lấy toàn bộ số lượng từ
 
             // VÒNG LẶP 1: Duyệt qua từng phần tử
             for (int i = 0; i < n - 1; i++)
@@ -328,12 +357,10 @@ namespace EnglishVietnameseDictionary
                 {
                     // So sánh: Nếu từ đứng trước (j) LỚN HƠN từ đứng sau (j+1)
                     // (Ví dụ: "Zoo" > "Apple") -> Thì đổi chỗ
-                    if (string.Compare(KeyList[j], KeyList[j + 1], StringComparison.OrdinalIgnoreCase) > 0)
+                    if (string.Compare(_manager.KeyList[j], _manager.KeyList[j + 1], StringComparison.OrdinalIgnoreCase) > 0)
                     {
                         // Hoán đổi (Swap)
-                        string temp = KeyList[j];
-                        KeyList[j] = KeyList[j + 1];
-                        KeyList[j + 1] = temp;
+                        _basic.Swap(_manager.KeyList, j, j+1);
                     }
                 }
             }
@@ -353,7 +380,7 @@ namespace EnglishVietnameseDictionary
             if (string.IsNullOrEmpty(keyword)) return suggestions;
 
             // 2. Chạy vòng lặp duyệt qua tất cả từ vựng hiện có
-            foreach (string word in KeyList)
+            foreach (string word in _manager.KeyList)
             {
                 // 3. Kiểm tra: Nếu từ này BẮT ĐẦU bằng từ khóa (Không phân biệt hoa thường)
                 // Ví dụ: word="Apple", keyword="ap" -> True
@@ -407,7 +434,7 @@ namespace EnglishVietnameseDictionary
             // Nếu từ quá ngắn (dưới 3 ký tự) thì không sửa lỗi để tránh rác
             if (keyword.Length < 3) return suggestions;
 
-            foreach (string word in KeyList)
+            foreach (string word in _manager.KeyList)
             {
                 // Tối ưu: Nếu độ dài chênh lệch quá 2 ký tự thì bỏ qua luôn
                 if (Math.Abs(word.Length - keyword.Length) > 2) continue;
@@ -426,11 +453,6 @@ namespace EnglishVietnameseDictionary
                 if (suggestions.Count >= 5) break;
             }
             return suggestions;
-        }
-        private void InitSampleData()
-        {
-            // Tạo file mẫu chuẩn CSV
-            File.WriteAllText(_filePath, "apple,quả táo\nbanana,quả chuối\ncomputer,máy tính");
         }
     }
 }

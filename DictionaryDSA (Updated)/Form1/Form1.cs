@@ -7,18 +7,24 @@ namespace EnglishVietnameseDictionary
     public partial class Form1 : Form
     {
         private DictionaryManager _dictManager;
+        private DictionaryBasic _dictBasic;
+        private DictionaryAlgo _dictAlgo;
 
         public Form1()
         {
             InitializeComponent();
             _dictManager = new DictionaryManager();
+            _dictBasic = new DictionaryBasic(_dictManager);
+            _dictAlgo = new DictionaryAlgo(_dictManager);
+            _dictBasic.SetAlgo(_dictAlgo);
+            _dictAlgo.SetBasic(_dictBasic);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             try
             {
-                _dictManager.LoadData();
+                _dictBasic.ImportData(_dictManager._filePath);
                 UpdateListBox(_dictManager.KeyList);
             }
             catch (Exception ex)
@@ -81,7 +87,7 @@ namespace EnglishVietnameseDictionary
             }
 
             // 2. CHẠY THUẬT TOÁN 5 (Tìm đúng/Tiền tố trước)
-            List<string> results = _dictManager.GetSuggestionsManual(keyword);
+            List<string> results = _dictAlgo.GetSuggestionsManual(keyword);
 
             // 3. KIỂM TRA KẾT QUẢ
             if (results.Count > 0)
@@ -91,15 +97,15 @@ namespace EnglishVietnameseDictionary
                 lblStatus.Text = $"Tìm thấy {results.Count} từ.";
 
                 // Hiện nghĩa của từ đầu tiên nếu khớp hoàn toàn
-                int index = _dictManager.BinarySearchKey(keyword);
-                if (index != -1) txtResult.Text = _dictManager.GetMeaning(keyword);
+                int index = _dictAlgo.BinarySearchKey(keyword);
+                if (index != -1) txtResult.Text = _dictBasic.GetMeaning(keyword);
                 else txtResult.Text = "";
             }
             else
             {
                 // 4. NẾU KHÔNG TÌM THẤY -> KÍCH HOẠT AUTOCORRECT (Thuật toán 6)
                 // Đây là lúc bạn gõ "aple" và code nhảy vào đây
-                List<string> autoCorrectResults = _dictManager.SearchAutocorrect(keyword);
+                List<string> autoCorrectResults = _dictAlgo.SearchAutocorrect(keyword);
 
                 if (autoCorrectResults.Count > 0)
                 {
@@ -110,7 +116,7 @@ namespace EnglishVietnameseDictionary
                     lblStatus.ForeColor = Color.Red;
 
                     // Tự động chọn từ đầu tiên apple
-                    txtResult.Text = _dictManager.GetMeaning(autoCorrectResults[0]);
+                    txtResult.Text = _dictBasic.GetMeaning(autoCorrectResults[0]);
                 }
                 else
                 {
@@ -130,7 +136,7 @@ namespace EnglishVietnameseDictionary
                 string selectedWord = lstWords.SelectedItem.ToString();
 
                 // Sử dụng Dictionary để lấy nghĩa (O(1)) thay vì duyệt List Values
-                string meaning = _dictManager.GetMeaning(selectedWord);
+                string meaning = _dictBasic.GetMeaning(selectedWord);
 
                 txtResult.Text = meaning;
 
@@ -155,7 +161,7 @@ namespace EnglishVietnameseDictionary
 
             if (!string.IsNullOrEmpty(newWord) && !string.IsNullOrEmpty(newMeaning))
             {
-                if (_dictManager.AddWord(newWord, newMeaning))
+                if (_dictBasic.AddWord(newWord, newMeaning))
                 {
                     MessageBox.Show("Thêm thành công!", "Thông báo");
                     UpdateListBox(_dictManager.KeyList); 
@@ -181,7 +187,7 @@ namespace EnglishVietnameseDictionary
                 try
                 {
                     // Gọi hàm và lấy số lượng từ đã thêm
-                    int addedCount = _dictManager.ImportData(dialog.FileName);
+                    int addedCount = _dictBasic.ImportData(dialog.FileName);
 
                     UpdateListBox(_dictManager.KeyList);
 
@@ -218,7 +224,7 @@ namespace EnglishVietnameseDictionary
 
             if (confirm == DialogResult.Yes)
             {
-                if (_dictManager.RemoveWord(word))
+                if (_dictBasic.RemoveWord(word))
                 {
                     MessageBox.Show("Đã xóa thành công!", "Thông báo");
 
@@ -254,7 +260,7 @@ namespace EnglishVietnameseDictionary
                 return;
             }
 
-            string currentDef = _dictManager.GetMeaning(word);
+            string currentDef = _dictBasic.GetMeaning(word);
 
             // Lưu ý: Hàm GetMeaning có thể trả về câu thông báo lỗi nếu không tìm thấy
             // Nên ta cần đảm bảo từ đó thực sự tồn tại trước khi so sánh
@@ -275,7 +281,7 @@ namespace EnglishVietnameseDictionary
             }
 
             // Gọi hàm sửa bên DictionaryManager
-            if (_dictManager.UpdateMeaning(word, newMeaning))
+            if (_dictBasic.UpdateMeaning(word, newMeaning))
             {
                 MessageBox.Show("Đã cập nhật nghĩa mới!");
                 // Không cần UpdateListBox vì danh sách từ (Key) không thay đổi
@@ -307,7 +313,7 @@ namespace EnglishVietnameseDictionary
             if (result == DialogResult.Yes)
             {
                 // 1. Gọi hàm dọn dẹp ở tầng dữ liệu
-                _dictManager.ClearAllData();
+                _dictBasic.ClearAllData();
 
                 // 2. Cập nhật giao diện (Xóa trắng ListBox và các ô nhập)
                 UpdateListBox(null); // Hoặc truyền vào list rỗng
