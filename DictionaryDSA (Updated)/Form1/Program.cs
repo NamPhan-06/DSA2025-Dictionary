@@ -146,7 +146,7 @@ namespace EnglishVietnameseDictionary
                 totalTicks5 += sw.ElapsedTicks;
                 sw.Reset();
             }
-            double binavgtime = (double)totalTicks4 / 1000 / Stopwatch.Frequency * 1000;
+            double binavgtime = (double)totalTicks5 / 1000 / Stopwatch.Frequency * 1000;
             report.AppendLine($"5. Binary Search (1000 lần): {binavgtime:F4} ms");
 
 
